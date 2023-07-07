@@ -16,5 +16,5 @@ public partial class MainWindow : Window
     }
 
     private void OpenSelectDialogButton_Click(object sender, RoutedEventArgs e)
-        => new SelectDialog((ViewModel)DataContext) { Owner=this}.ShowDialog();
+        => new SelectDialog((ViewModel)DataContext) { Owner = this, }.ShowDialog();
 }
