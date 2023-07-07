@@ -6,13 +6,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace Qt6uox4f1iujybm;
 
 
-public partial class Item : ObservableObject
+public partial class PictItem : ObservableObject
 {
     [ObservableProperty] private string? fileTitle;
     public string FilePath { get; }
     public string FileName => Path.GetFileNameWithoutExtension(FilePath);
 
-    public Item(string filePath)
+    public PictItem(string filePath)
     {
         FilePath = filePath;
         using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
