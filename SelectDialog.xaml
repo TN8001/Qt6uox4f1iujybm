@@ -5,84 +5,86 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:local="clr-namespace:Qt6uox4f1iujybm"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  Title="SelectDialog"
+  Title="背景画像の選択"
   Width="800"
   Height="450"
   d:DataContext="{d:DesignInstance Type=local:ViewModel}"
   AllowDrop="True"
   DragOver="File_DragOver"
   Drop="File_Drop"
+  WindowStartupLocation="CenterOwner"
   mc:Ignorable="d">
+  <Window.Resources>
+    <local:ImageConverter x:Key="ImageConverter" />
+  </Window.Resources>
+
   <DockPanel>
-    <StackPanel
-      HorizontalAlignment="Right"
-      DockPanel.Dock="Bottom"
-      Orientation="Horizontal">
+    <StackPanel HorizontalAlignment="Right" DockPanel.Dock="Bottom" Orientation="Horizontal">
       <Button
         MinWidth="80"
-        Margin="10"
+        Margin="8"
         Click="Ok_Button_Click"
         Command="{Binding ApplyCommand}"
-        CommandParameter="{Binding Items/}"
-        Content="Ok"
+        CommandParameter="{Binding PictItems/}"
+        Content="OK"
         IsDefault="True" />
       <Button
         MinWidth="80"
-        Margin="10"
+        Margin="8"
         Content="Cancel"
         IsCancel="True" />
       <Button
         MinWidth="80"
-        Margin="10"
+        Margin="8"
         Command="{Binding ApplyCommand}"
-        CommandParameter="{Binding Items/}"
+        CommandParameter="{Binding PictItems/}"
         Content="適用" />
     </StackPanel>
     <Grid>
       <Grid.ColumnDefinitions>
         <ColumnDefinition />
-        <ColumnDefinition Width="5" />
-        <ColumnDefinition Width="2*" />
+        <ColumnDefinition Width="4" />
+        <ColumnDefinition />
       </Grid.ColumnDefinitions>
 
       <!--
         IsSynchronizedWithCurrentItem 選択の同期
         [Selector.IsSynchronizedWithCurrentItem プロパティ (System.Windows.Controls.Primitives) | Microsoft Learn](https://learn.microsoft.com/ja-jp/dotnet/api/system.windows.controls.primitives.selector.issynchronizedwithcurrentitem)
       -->
-      <ListView IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding Items}">
-        <ListView.View>
-          <GridView>
-            <GridViewColumn Width="200" Header="タイトル">
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
-                  <TextBox
-                    Width="200"
-                    Padding="1"
-                    Text="{Binding FileTitle}"
-                    TextWrapping="Wrap" />
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-            <GridViewColumn DisplayMemberBinding="{Binding FileName}" Header="ファイル名" />
-            <GridViewColumn>
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
+      <DataGrid
+        d:ItemsSource="{d:SampleData}"
+        AutoGenerateColumns="False"
+        IsSynchronizedWithCurrentItem="True"
+        ItemsSource="{Binding PictItems}"
+        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <DataGrid.Columns>
+          <DataGridTextColumn Width="200" Binding="{Binding FileTitle}" Header="タイトル" />
+          <DataGridTextColumn
+            Width="*"
+            Binding="{Binding FileName}"
+            Header="ファイル名"
+            IsReadOnly="True">
+            <DataGridTextColumn.CellStyle>
+              <Style TargetType="DataGridCell">
+                <Setter Property="ToolTip" Value="{Binding FileName}" />
+              </Style>
+            </DataGridTextColumn.CellStyle>
+          </DataGridTextColumn>
+          <DataGridTemplateColumn>
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
 
-                  <!--
-                    ここでのDataContextは個々のItemになっているため、
-                    コマンドのあるViewModelをListViewまでさかのぼって取得
-                    [RelativeSource のマークアップ拡張機能 - WPF .NET Framework | Microsoft Learn](https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/advanced/relativesource-markupextension)
-                  -->
-                  <Button
-                    Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
-                    CommandParameter="{Binding}"
-                    Content="削除" />
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-          </GridView>
-        </ListView.View>
-      </ListView>
+                <!--
+                  ここでのDataContextは個々のItemになっているため、
+                  コマンドのあるViewModelをDataGridまでさかのぼって取得
+                  [RelativeSource のマークアップ拡張機能 - WPF .NET Framework | Microsoft Learn](https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/advanced/relativesource-markupextension)
+                -->
+                <Button Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" CommandParameter="{Binding}" Content="削除" />
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+        </DataGrid.Columns>
+      </DataGrid>
 
       <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
 
@@ -90,7 +92,7 @@
         Grid.Column="2"
         d:ItemsSource="{d:SampleData}"
         IsSynchronizedWithCurrentItem="True"
-        ItemsSource="{Binding Items}"
+        ItemsSource="{Binding PictItems}"
         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
         <ListView.ItemsPanel>
           <ItemsPanelTemplate>
@@ -103,7 +105,7 @@
               <TextBlock Text="{Binding FileTitle}" />
 
               <!--
-                ロックさせないコンバータ（App.xaml内）
+                ロックさせないコンバータ
                 [WPFで画像表示時にファイルをロックしないようにしたい - かずきのBlog@hatena](https://blog.okazuki.jp/entry/2015/06/20/122427)
               -->
               <Image Source="{Binding FilePath, Converter={StaticResource ImageConverter}}" />

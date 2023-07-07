@@ -12,11 +12,9 @@ namespace Qt6uox4f1iujybm;
 
 public partial class ViewModel : ObservableObject
 {
-    public ObservableCollection<Item> Items { get; } = new();
+    public ObservableCollection<PictItem> PictItems { get; } = new();
 
-    [ObservableProperty] private bool isSubWindowShown;
-
-    [ObservableProperty] private Item? selectedItem;
+    [ObservableProperty] private PictItem? selectedPictItem;
 
 
     private readonly string folder;
@@ -29,23 +27,20 @@ public partial class ViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Delete(Item item)
+    private void Delete(PictItem item)
     {
-        Items.Remove(item);
+        PictItems.Remove(item);
         File.Delete(item.FilePath);
     }
 
-    [RelayCommand]
-    private void Apply(Item? item) => SelectedItem = item;
+    [RelayCommand] private void Apply(PictItem? item) => SelectedPictItem = item;
 
-
-
-    public void ImportFiles(IEnumerable<string> paths)
+    private void ImportFiles(IEnumerable<string> paths)
     {
-        foreach (var path in paths) Items.Add(new(path));
+        foreach (var path in paths) PictItems.Add(new(path));
     }
 
-    public void AddItem(string path, Func<bool> isOverwrite)
+    public void AddPictItem(string path, Func<bool> isOverwrite)
     {
         var fileName = Path.GetFileNameWithoutExtension(path);
         var outPath = Path.Combine(folder, $"{fileName}.jpg");
@@ -53,7 +48,7 @@ public partial class ViewModel : ObservableObject
         if (File.Exists(outPath))
         {
             if (!isOverwrite()) return;
-            Items.Remove(Items.FirstOrDefault(x => x.FilePath == outPath)!);
+            PictItems.Remove(PictItems.FirstOrDefault(x => x.FilePath == outPath)!);
         }
 
         using (var fsin = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
@@ -66,6 +61,6 @@ public partial class ViewModel : ObservableObject
             enc.Save(fsout);
         }
 
-        Items.Add(new(outPath));
+        PictItems.Add(new(outPath));
     }
 }
