@@ -17,6 +17,11 @@
         Content="背景画像の選択" />
     </ToolBar>
     <Grid>
+
+      <!--
+        ロックさせないコンバータ
+        [WPFで画像表示時にファイルをロックしないようにしたい - かずきのBlog@hatena](https://blog.okazuki.jp/entry/2015/06/20/122427)
+      -->
       <Image
         Width="1000"
         Height="800"
