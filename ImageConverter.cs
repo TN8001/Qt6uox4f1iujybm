@@ -8,7 +8,6 @@ using System.Windows.Media.Imaging;
 namespace Qt6uox4f1iujybm;
 
 
-
 // [WPFで画像表示時にファイルをロックしないようにしたい - かずきのBlog@hatena](https://blog.okazuki.jp/entry/2015/06/20/122427)
 public class ImageConverter : IValueConverter
 {

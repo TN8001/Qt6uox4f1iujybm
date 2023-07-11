@@ -6,22 +6,15 @@ using System.Windows;
 namespace Qt6uox4f1iujybm;
 
 
-public partial class SelectDialog : Window
+public partial class SelectPictDialog : Window
 {
-    private static readonly string[] SupportedFormats = { ".jpg", ".jpeg", ".bmp", ".png" };
+    private static readonly string[] supportedFormats = { ".jpg", ".jpeg", ".bmp", ".png", };
 
-    private readonly ViewModel viewModel;
-
-    public SelectDialog(ViewModel viewModel)
-    {
-        InitializeComponent();
-        DataContext = this.viewModel = viewModel;
-    }
+    public SelectPictDialog() => InitializeComponent();
 
     private void File_DragOver(object sender, DragEventArgs e)
     {
-        e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop, true) ? DragDropEffects.Copy
-                                                                      : DragDropEffects.None;
+        e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop, true) ? DragDropEffects.Copy : DragDropEffects.None;
         e.Handled = true;
     }
 
@@ -31,10 +24,10 @@ public partial class SelectDialog : Window
 
         var files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-        var ok = files.Where(x => SupportedFormats.Contains(Path.GetExtension(x).ToLower()));
+        var ok = files.Where(x => supportedFormats.Contains(Path.GetExtension(x).ToLower()));
         foreach (var path in ok)
         {
-            viewModel.AddPictItem(path, IsOverwrite);
+            ((ViewModel)DataContext).Pict?.AddItem(path, IsOverwrite);
 
             // ViewModel内でMessageBox.Showしたくないので、確認画面をローカル関数で雑に差し込むｗ
             //[ローカル関数 -C# プログラミング ガイド | Microsoft Learn](https://learn.microsoft.com/ja-jp/dotnet/csharp/programming-guide/classes-and-structs/local-functions)
@@ -46,7 +39,7 @@ public partial class SelectDialog : Window
             }
         }
 
-        var ng = files.Where(x => !SupportedFormats.Contains(Path.GetExtension(x).ToLower()));
+        var ng = files.Where(x => !supportedFormats.Contains(Path.GetExtension(x).ToLower()));
         if (ng.Any()) MessageBox.Show(this, $"{string.Join("\n", ng)}\nのファイルは読めませんでした");
     }
 

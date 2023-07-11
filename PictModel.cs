@@ -1,10 +1,61 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Qt6uox4f1iujybm;
 
+
+public partial class PictModel : ObservableObject
+{
+    public ObservableCollection<PictItem> Items { get; } = new();
+    [ObservableProperty] private PictItem? selectedItem;
+
+    private readonly string folder;
+
+    public PictModel(string folder)
+    {
+        this.folder = folder;
+        Directory.CreateDirectory(folder);
+        foreach (var path in Directory.EnumerateFiles(folder, "*.jpg", SearchOption.TopDirectoryOnly))
+            Items.Add(new(path));
+    }
+
+    [RelayCommand] private void Apply(PictItem? item) => SelectedItem = item;
+    [RelayCommand]
+    private void Delete(PictItem item)
+    {
+        Items.Remove(item);
+        File.Delete(item.FilePath);
+    }
+
+    public void AddItem(string path, Func<bool> isOverwrite)
+    {
+        var fileName = Path.GetFileNameWithoutExtension(path);
+        var outPath = Path.Combine(folder, $"{fileName}.jpg");
+
+        if (File.Exists(outPath))
+        {
+            if (!isOverwrite()) return;
+            Items.Remove(Items.FirstOrDefault(x => x.FilePath == outPath)!);
+        }
+
+        using (var fsin = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
+        using (var fsout = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+        {
+            var f = BitmapFrame.Create(fsin, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnDemand);
+            var meta = f.Metadata.Clone() as BitmapMetadata ?? new BitmapMetadata("jpg");
+            var enc = new JpegBitmapEncoder();
+            enc.Frames.Add(BitmapFrame.Create(f, f.Thumbnail, meta, f.ColorContexts));
+            enc.Save(fsout);
+        }
+
+        Items.Add(new(outPath));
+    }
+}
 
 public partial class PictItem : ObservableObject
 {
@@ -34,7 +85,6 @@ public partial class PictItem : ObservableObject
 
         if (!meta.TrySave())
         {
-            Debug.WriteLine("TrySave:false");
             using var fsout = new FileStream(FilePath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
             var encoder = new JpegBitmapEncoder();
             foreach (var cloneFrame in decoder.Frames) encoder.Frames.Add(BitmapFrame.Create(cloneFrame));
