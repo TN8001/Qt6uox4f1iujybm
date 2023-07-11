@@ -9,22 +9,12 @@
   d:DataContext="{d:DesignInstance Type=local:ViewModel}"
   SizeToContent="WidthAndHeight"
   mc:Ignorable="d">
-  <Window.Resources>
-    <local:ImageConverter x:Key="ImageConverter" />
-  </Window.Resources>
-
   <DockPanel>
     <ToolBar DockPanel.Dock="Top">
-      <Button MinWidth="128" Click="OpenSelectDialogButton_Click" Content="背景画像の選択" />
-      <Separator />
-      <RadioButton
-        MinWidth="32"
-        MinHeight="32"
-        Content="?"
-        IsChecked="True" />
-      <RadioButton MinWidth="32" MinHeight="32">
-        <Rectangle Width="24" Height="16" Stroke="Black" />
-      </RadioButton>
+      <Button
+        MinWidth="128"
+        Click="OpenSelectPictDialog_Click"
+        Content="背景画像の選択" />
     </ToolBar>
     <Grid>
 
@@ -37,7 +27,7 @@
         Height="800"
         HorizontalAlignment="Left"
         VerticalAlignment="Top"
-        Source="{Binding SelectedPictItem.FilePath, Converter={StaticResource ImageConverter}}"
+        Source="{Binding Pict.SelectedItem.FilePath, Converter={StaticResource ImageConverter}}"
         StretchDirection="DownOnly" />
     </Grid>
   </DockPanel>

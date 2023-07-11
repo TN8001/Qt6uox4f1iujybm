@@ -1,5 +1,5 @@
 ﻿<Window
-  x:Class="Qt6uox4f1iujybm.SelectDialog"
+  x:Class="Qt6uox4f1iujybm.SelectPictDialog"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,18 +14,17 @@
   Drop="File_Drop"
   WindowStartupLocation="CenterOwner"
   mc:Ignorable="d">
-  <Window.Resources>
-    <local:ImageConverter x:Key="ImageConverter" />
-  </Window.Resources>
-
   <DockPanel>
-    <StackPanel HorizontalAlignment="Right" DockPanel.Dock="Bottom" Orientation="Horizontal">
+    <StackPanel
+      HorizontalAlignment="Right"
+      DockPanel.Dock="Bottom"
+      Orientation="Horizontal">
       <Button
         MinWidth="80"
         Margin="8"
         Click="Ok_Button_Click"
-        Command="{Binding ApplyCommand}"
-        CommandParameter="{Binding PictItems/}"
+        Command="{Binding Pict.ApplyCommand}"
+        CommandParameter="{Binding Pict.Items/}"
         Content="OK"
         IsDefault="True" />
       <Button
@@ -36,8 +35,8 @@
       <Button
         MinWidth="80"
         Margin="8"
-        Command="{Binding ApplyCommand}"
-        CommandParameter="{Binding PictItems/}"
+        Command="{Binding Pict.ApplyCommand}"
+        CommandParameter="{Binding Pict.Items/}"
         Content="適用" />
     </StackPanel>
     <Grid>
@@ -47,18 +46,17 @@
         <ColumnDefinition />
       </Grid.ColumnDefinitions>
 
-      <!--
-        IsSynchronizedWithCurrentItem 選択の同期
-        [Selector.IsSynchronizedWithCurrentItem プロパティ (System.Windows.Controls.Primitives) | Microsoft Learn](https://learn.microsoft.com/ja-jp/dotnet/api/system.windows.controls.primitives.selector.issynchronizedwithcurrentitem)
-      -->
       <DataGrid
         d:ItemsSource="{d:SampleData}"
         AutoGenerateColumns="False"
         IsSynchronizedWithCurrentItem="True"
-        ItemsSource="{Binding PictItems}"
+        ItemsSource="{Binding Pict.Items}"
         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
         <DataGrid.Columns>
-          <DataGridTextColumn Width="200" Binding="{Binding FileTitle}" Header="タイトル" />
+          <DataGridTextColumn
+            Width="200"
+            Binding="{Binding FileTitle}"
+            Header="タイトル" />
           <DataGridTextColumn
             Width="*"
             Binding="{Binding FileName}"
@@ -77,9 +75,11 @@
                 <!--
                   ここでのDataContextは個々のItemになっているため、
                   コマンドのあるViewModelをDataGridまでさかのぼって取得
-                  [RelativeSource のマークアップ拡張機能 - WPF .NET Framework | Microsoft Learn](https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/advanced/relativesource-markupextension)
                 -->
-                <Button Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" CommandParameter="{Binding}" Content="削除" />
+                <Button
+                  Command="{Binding DataContext.Pict.DeleteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}"
+                  CommandParameter="{Binding}"
+                  Content="削除" />
               </DataTemplate>
             </DataGridTemplateColumn.CellTemplate>
           </DataGridTemplateColumn>
@@ -88,31 +88,30 @@
 
       <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
 
-      <ListView
+      <ListBox
         Grid.Column="2"
         d:ItemsSource="{d:SampleData}"
         IsSynchronizedWithCurrentItem="True"
-        ItemsSource="{Binding PictItems}"
+        ItemsSource="{Binding Pict.Items}"
         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-        <ListView.ItemsPanel>
+        <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <WrapPanel />
           </ItemsPanelTemplate>
-        </ListView.ItemsPanel>
-        <ListView.ItemTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemTemplate>
           <DataTemplate>
-            <Grid Width="150" Height="150">
-              <TextBlock Text="{Binding FileTitle}" />
-
+            <StackPanel MaxWidth="150">
               <!--
                 ロックさせないコンバータ
                 [WPFで画像表示時にファイルをロックしないようにしたい - かずきのBlog@hatena](https://blog.okazuki.jp/entry/2015/06/20/122427)
               -->
-              <Image Source="{Binding FilePath, Converter={StaticResource ImageConverter}}" />
-            </Grid>
+              <Image MaxHeight="150" Source="{Binding FilePath, Converter={StaticResource ImageConverter}}" />
+              <TextBlock Text="{Binding FileTitle}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
           </DataTemplate>
-        </ListView.ItemTemplate>
-      </ListView>
+        </ListBox.ItemTemplate>
+      </ListBox>
     </Grid>
   </DockPanel>
 </Window>
