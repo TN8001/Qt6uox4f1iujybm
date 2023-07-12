@@ -27,7 +27,7 @@ public partial class SelectPictDialog : Window
         var ok = files.Where(x => supportedFormats.Contains(Path.GetExtension(x).ToLower()));
         foreach (var path in ok)
         {
-            ((ViewModel)DataContext).Pict?.AddItem(path, IsOverwrite);
+            ((PictModel)DataContext).AddItem(path, IsOverwrite);
 
             // ViewModel内でMessageBox.Showしたくないので、確認画面をローカル関数で雑に差し込むｗ
             //[ローカル関数 -C# プログラミング ガイド | Microsoft Learn](https://learn.microsoft.com/ja-jp/dotnet/csharp/programming-guide/classes-and-structs/local-functions)

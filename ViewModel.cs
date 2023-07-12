@@ -4,4 +4,5 @@
 public partial class ViewModel
 {
     public PictModel? Pict { get; init; }
+    public RectModel? Rect { get; init; }
 }

@@ -8,7 +8,7 @@
   Title="背景画像の選択"
   Width="800"
   Height="450"
-  d:DataContext="{d:DesignInstance Type=local:ViewModel}"
+  d:DataContext="{d:DesignInstance Type=local:PictModel}"
   AllowDrop="True"
   DragOver="File_DragOver"
   Drop="File_Drop"
@@ -23,8 +23,8 @@
         MinWidth="80"
         Margin="8"
         Click="Ok_Button_Click"
-        Command="{Binding Pict.ApplyCommand}"
-        CommandParameter="{Binding Pict.Items/}"
+        Command="{Binding ApplyCommand}"
+        CommandParameter="{Binding Items/}"
         Content="OK"
         IsDefault="True" />
       <Button
@@ -35,8 +35,8 @@
       <Button
         MinWidth="80"
         Margin="8"
-        Command="{Binding Pict.ApplyCommand}"
-        CommandParameter="{Binding Pict.Items/}"
+        Command="{Binding ApplyCommand}"
+        CommandParameter="{Binding Items/}"
         Content="適用" />
     </StackPanel>
     <Grid>
@@ -50,7 +50,7 @@
         d:ItemsSource="{d:SampleData}"
         AutoGenerateColumns="False"
         IsSynchronizedWithCurrentItem="True"
-        ItemsSource="{Binding Pict.Items}"
+        ItemsSource="{Binding Items}"
         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
         <DataGrid.Columns>
           <DataGridTextColumn
@@ -77,7 +77,7 @@
                   コマンドのあるViewModelをDataGridまでさかのぼって取得
                 -->
                 <Button
-                  Command="{Binding DataContext.Pict.DeleteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}"
+                  Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}"
                   CommandParameter="{Binding}"
                   Content="削除" />
               </DataTemplate>
@@ -92,7 +92,7 @@
         Grid.Column="2"
         d:ItemsSource="{d:SampleData}"
         IsSynchronizedWithCurrentItem="True"
-        ItemsSource="{Binding Pict.Items}"
+        ItemsSource="{Binding Items}"
         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
