@@ -10,16 +10,71 @@
   d:DataContext="{d:DesignInstance Type=local:ViewModel}"
   SizeToContent="WidthAndHeight"
   mc:Ignorable="d">
+  <Window.Resources>
+    
+    <!--
+      移動・リサイズに使用するテンプレート
+      （DragDeltaイベントで動かすので）Thumbがないと何もしない
+      Alignmentを見てどこの部分か判断するので配置法に注意
+    -->
+    <ControlTemplate x:Key="ResizeAdornerTemplate">
+      <ControlTemplate.Resources>
+        <Style TargetType="Thumb">
+          <Setter Property="Template">
+            <Setter.Value>
+              <ControlTemplate>
+                <Rectangle
+                  MinWidth="10"
+                  MinHeight="10"
+                  Margin="-5"
+                  Fill="Transparent" />
+              </ControlTemplate>
+            </Setter.Value>
+          </Setter>
+        </Style>
+      </ControlTemplate.Resources>
+      <Grid>
+        
+        <!--  移動  -->
+        <Thumb Cursor="SizeAll" />
+
+        <!--  辺 リサイズ  -->
+        <Thumb HorizontalAlignment="Left" Cursor="SizeWE" />
+        <Thumb HorizontalAlignment="Right" Cursor="SizeWE" />
+        <Thumb VerticalAlignment="Top" Cursor="SizeNS" />
+        <Thumb VerticalAlignment="Bottom" Cursor="SizeNS" />
+
+        <!--  角 リサイズ  -->
+        <Thumb HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" />
+        <Thumb HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" />
+        <Thumb HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" />
+        <Thumb HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" />
+      </Grid>
+    </ControlTemplate>
+
+    <DataTemplate DataType="{x:Type local:RectItem}">
+      <Rectangle
+        Width="{Binding Width, Mode=TwoWay}"
+        Height="{Binding Height, Mode=TwoWay}"
+        Fill="{Binding Fill}"
+        Stroke="{Binding Stroke}"
+        StrokeThickness="{Binding StrokeThickness}">
+        <i:Interaction.Behaviors>
+          
+          <!--
+            ドラッグで移動・リサイズするビヘイビア
+            リサイズさせたいアイテム自体にアタッチ
+            ItemsPanelがCanvasのListBoxに配置されるという前提
+          -->
+          <local:ResizeBehavior AdornerTemplate="{StaticResource ResizeAdornerTemplate}" />
+        </i:Interaction.Behaviors>
+      </Rectangle>
+    </DataTemplate>
+  </Window.Resources>
   <DockPanel>
     <ToolBar DockPanel.Dock="Top">
-      <Button
-        MinWidth="128"
-        Click="OpenSelectPictDialog_Click"
-        Content="背景画像の選択" />
-      <Button
-        MinWidth="128"
-        Click="OpenRectListWindow_Click"
-        Content="四角の詳細" />
+      <Button MinWidth="128" Click="OpenSelectPictDialog_Click" Content="背景画像の選択" />
+      <Button MinWidth="128" Click="OpenRectListWindow_Click" Content="四角の詳細" />
     </ToolBar>
     <Grid>
 
@@ -35,20 +90,8 @@
         Source="{Binding Pict.SelectedItem.FilePath, Converter={StaticResource ImageConverter}}"
         StretchDirection="DownOnly" />
 
-      <ListBox
-        Background="{x:Null}"
-        IsSynchronizedWithCurrentItem="True"
-        ItemsSource="{Binding Rect.Items}">
-        <ListBox.Resources>
-          <DataTemplate DataType="{x:Type local:RectItem}">
-            <Rectangle
-              Width="{Binding Width, Mode=TwoWay}"
-              Height="{Binding Height, Mode=TwoWay}"
-              Fill="{Binding Fill}"
-              Stroke="{Binding Stroke}"
-              StrokeThickness="{Binding StrokeThickness}" />
-          </DataTemplate>
-        </ListBox.Resources>
+      <ListBox Background="{x:Null}" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding Rect.Items}">
+        <ListBox.Resources />
 
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
